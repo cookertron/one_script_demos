@@ -10,8 +10,8 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 pygame.init()
-PDR = Rect(0, 0, 1280, 720)
-PDS = pygame.display.set_mode(PDR.size)
+PDR = Rect(0, 0, 1280, 800)
+PDS = pygame.display.set_mode(PDR.size, pygame.FULLSCREEN | pygame.SCALED)
 
 class platform:
     def __init__(s, position, width):
@@ -26,7 +26,6 @@ class player:
     def __init__(s, position):
         s.pos = position
         s.velocity = 0
-        s.jumping = True
 
     def draw(s):
         global PDS, PLAYER_RADIUS
@@ -40,22 +39,21 @@ class player:
         s.pos[1] += s.velocity * DELTA_TIME
         s.velocity += GRAVITY * DELTA_TIME
 
-        k = pygame.key.get_pressed()
-        if k[pygame.K_SPACE] and not s.jumping:
-            s.velocity = -7
-            s.jumping = True
-        if k[pygame.K_LEFT]:
-            s.pos[0] -= 3 * DELTA_TIME
-        if k[pygame.K_RIGHT]:
-            s.pos[0] += 3 * DELTA_TIME
-
         if s.velocity >= 0:
             for p in PLATFORMS:
                 if s.pos[0] >= p.rect.left and s.pos[0] <= p.rect.right:
                     if s.previous_pos[1] + PLAYER_RADIUS <= p.rect.top and s.pos[1] + PLAYER_RADIUS > p.rect.top:
                         s.pos = [s.pos[0], p.rect.top - PLAYER_RADIUS]
                         s.velocity = 0
-                        s.jumping = False
+
+        k = pygame.key.get_pressed()
+        if k[pygame.K_SPACE] and s.velocity == 0:
+            s.velocity = -7
+        if k[pygame.K_LEFT]:
+            s.pos[0] -= 3 * DELTA_TIME
+        if k[pygame.K_RIGHT]:
+            s.pos[0] += 3 * DELTA_TIME
+
 
 PLATFORMS = [platform((0, PDR.h - 20), PDR.w),
     platform((PDR.centerx - 75, PDR.bottom - 200), 150),
